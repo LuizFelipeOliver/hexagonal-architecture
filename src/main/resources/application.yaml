@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: hexagonal-architecture
+  datasource:
+    url: jdbc:postgresql://localhost:5432/hexagonal_db
+    username: demon
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

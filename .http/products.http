@@ -1,0 +1,79 @@
+### ===================================================
+
+
+### Product API - Hexagonal Architecture
+
+
+### ===================================================
+
+@baseUrl = http://localhost:8080/api
+
+
+### ---------------------------------------------------
+
+
+### CREATE - Criar novo produto
+
+
+### ---------------------------------------------------
+
+POST {{baseUrl}}/products HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Notebook Dell",
+  "price": 4599.99
+}
+
+
+### ---------------------------------------------------
+
+
+### READ - Buscar produto por ID
+
+
+### ---------------------------------------------------
+
+GET {{baseUrl}}/products/1 HTTP/1.1
+
+
+### ---------------------------------------------------
+
+
+### READ - Listar todos os produtos
+
+
+### ---------------------------------------------------
+
+GET {{baseUrl}}/products HTTP/1.1
+
+
+### ---------------------------------------------------
+
+
+### UPDATE - Atualizar produto existente
+
+
+### ---------------------------------------------------
+
+PUT {{baseUrl}}/products/1 HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Notebook Dell Inspiron",
+  "price": 4299.99
+}
+
+
+### ---------------------------------------------------
+
+
+### DELETE - Remover produto
+
+
+### ---------------------------------------------------
+
+
+### 
+
+DELETE {{baseUrl}}/products/1 HTTP/1.1
