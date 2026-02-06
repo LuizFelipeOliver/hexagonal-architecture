@@ -12,8 +12,24 @@ public class Product {
   }
 
   public Product(Long id, String name, BigDecimal price) {
+    validatePrice(price);
     this.id = id;
     this.name = name;
+    this.price = price;
+  }
+
+  private void validatePrice(BigDecimal price) {
+    if (price == null) {
+      throw new IllegalArgumentException("Price is required");
+    }
+
+    if (price.compareTo(BigDecimal.ZERO) <= 0) {
+      throw new IllegalArgumentException("Price must be greater than zero");
+    }
+  }
+
+  public void createPrice(BigDecimal price) {
+    validatePrice(price);
     this.price = price;
   }
 
