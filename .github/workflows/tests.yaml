@@ -20,3 +20,11 @@ jobs:
 
       - name: Run tests
         run: ./mvnw test --batch-mode
+
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Test Results
+          path: target/surefire-reports/*.xml
+          reporter: java-junit
