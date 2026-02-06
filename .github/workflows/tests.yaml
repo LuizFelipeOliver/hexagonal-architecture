@@ -15,22 +15,59 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: "📥 Clonando repositório"
+        uses: actions/checkout@v4
 
-      - name: Set up Java 25
+      - name: "☕ Configurando Java 25"
         uses: actions/setup-java@v4
         with:
           java-version: "25"
           distribution: "temurin"
           cache: maven
 
-      - name: Run tests
-        run: ./mvnw test --batch-mode
+      - name: "📦 Baixando dependências"
+        run: |
+          echo "📦 Instalando dependências do Maven..."
+          ./mvnw dependency:resolve --batch-mode -q
+          echo "✅ Dependências instaladas com sucesso!"
 
-      - name: Test Report
+      - name: "🧪 Rodando testes"
+        run: |
+          echo "🧪 Iniciando execução dos testes..."
+          echo "----------------------------------------"
+          ./mvnw test --batch-mode
+          echo "----------------------------------------"
+          echo "✅ Todos os testes passaram!"
+
+      - name: "📊 Gerando relatório de testes"
         uses: dorny/test-reporter@v1
         if: always()
         with:
-          name: Test Results
+          name: "📋 Resultados dos Testes"
           path: target/surefire-reports/*.xml
           reporter: java-junit
+
+      - name: "📈 Resumo dos testes"
+        if: always()
+        run: |
+          echo "📈 Resumo da execução:"
+          echo "----------------------------------------"
+          if [ -d "target/surefire-reports" ]; then
+            TESTS=$(grep -r 'tests=' target/surefire-reports/*.xml | grep -oP 'tests="\K[0-9]+' | paste -sd+ | bc)
+            FAILURES=$(grep -r 'failures=' target/surefire-reports/*.xml | grep -oP 'failures="\K[0-9]+' | paste -sd+ | bc)
+            ERRORS=$(grep -r 'errors=' target/surefire-reports/*.xml | grep -oP 'errors="\K[0-9]+' | paste -sd+ | bc)
+            SKIPPED=$(grep -r 'skipped=' target/surefire-reports/*.xml | grep -oP 'skipped="\K[0-9]+' | paste -sd+ | bc)
+            echo "🧪 Total de testes: $TESTS"
+            echo "✅ Passaram:        $((TESTS - FAILURES - ERRORS - SKIPPED))"
+            echo "❌ Falharam:        $FAILURES"
+            echo "💥 Erros:           $ERRORS"
+            echo "⏭️  Ignorados:      $SKIPPED"
+            echo "----------------------------------------"
+            if [ "$FAILURES" -eq 0 ] && [ "$ERRORS" -eq 0 ]; then
+              echo "🎉 Todos os testes passaram com sucesso!"
+            else
+              echo "⚠️  Alguns testes falharam. Verifique o relatório acima."
+            fi
+          else
+            echo "⚠️  Nenhum relatório de teste encontrado."
+          fi
