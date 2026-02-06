@@ -6,13 +6,13 @@ import java.util.Optional;
 import com.api.hexagonal_architecture.core.domain.Product;
 
 public interface ProductServicePort {
-  Product cretateProduct(Product product);
+    Product cretateProduct(Product product);
 
-  Optional<Product> getProduct(Long id);
+    Optional<Product> getProduct(Long id);
 
-  List<Product> listProduct();
+    List<Product> listProduct();
 
-  Product updateProduct(Product product);
+    Product updateProduct(Product product);
 
-  void deleteProduct(Long id);
+    void deleteProduct(Long id);
 }

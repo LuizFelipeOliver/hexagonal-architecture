@@ -11,19 +11,19 @@ import com.api.hexagonal_architecture.port.output.ProductRepositoryPort;
 
 @Configuration
 public class AppConfig {
-  @Bean
-  public ProductService productService(ProductRepositoryPort productRepositoryPort) {
-    return new ProductService(productRepositoryPort);
-  }
+    @Bean
+    public ProductService productService(ProductRepositoryPort productRepositoryPort) {
+        return new ProductService(productRepositoryPort);
+    }
 
-  @Bean
-  public ProductRepositoryPort productRepositoryPort(ProductJpaRepository productRepository,
-      ProductMapper productMapper) {
-    return new ProductRepositoryImpl(productRepository, productMapper);
-  }
+    @Bean
+    public ProductRepositoryPort productRepositoryPort(ProductJpaRepository productRepository,
+        ProductMapper productMapper) {
+        return new ProductRepositoryImpl(productRepository, productMapper);
+    }
 
-  @Bean
-  public ProductMapper productMapper() {
-    return new ProductMapper();
-  }
+    @Bean
+    public ProductMapper productMapper() {
+        return new ProductMapper();
+    }
 }
