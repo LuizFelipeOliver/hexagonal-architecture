@@ -4,11 +4,11 @@ import com.api.hexagonal_architecture.adapter.output.persistence.entity.ProductE
 import com.api.hexagonal_architecture.core.domain.Product;
 
 public class ProductMapper {
-  public ProductEntity toEntity(Product product) {
-    return new ProductEntity(product.getId(), product.getName(), product.getPrice());
-  }
+    public ProductEntity toEntity(Product product) {
+        return new ProductEntity(product.getId(), product.getName(), product.getPrice());
+    }
 
-  public Product toDomain(ProductEntity productEntity) {
-    return new Product(productEntity.getId(), productEntity.getName(), productEntity.getPrice());
-  }
+    public Product toDomain(ProductEntity productEntity) {
+        return new Product(productEntity.getId(), productEntity.getName(), productEntity.getPrice());
+    }
 }

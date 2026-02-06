@@ -31,6 +31,14 @@ jobs:
           ./mvnw dependency:resolve --batch-mode -q
           echo "✅ Dependências instaladas com sucesso!"
 
+      - name: "🔍 Verificando estilo do código"
+        run: |
+          echo "🔍 Verificando estilo do código com Checkstyle..."
+          echo "----------------------------------------"
+          ./mvnw checkstyle:check --batch-mode
+          echo "----------------------------------------"
+          echo "✅ Estilo do código verificado com sucesso!"
+
       - name: "🧪 Rodando testes"
         run: |
           echo "🧪 Iniciando execução dos testes..."
