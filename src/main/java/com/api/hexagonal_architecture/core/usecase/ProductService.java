@@ -10,29 +10,29 @@ import com.api.hexagonal_architecture.port.output.ProductRepositoryPort;
 
 @Service
 public class ProductService {
-  private final ProductRepositoryPort productRepository;
+    private final ProductRepositoryPort productRepository;
 
-  public ProductService(ProductRepositoryPort productRepository) {
-    this.productRepository = productRepository;
-  }
+    public ProductService(ProductRepositoryPort productRepository) {
+        this.productRepository = productRepository;
+    }
 
-  public Product createProduct(Product product) {
-    return productRepository.save(product);
-  }
+    public Product createProduct(Product product) {
+        return productRepository.save(product);
+    }
 
-  public Optional<Product> findProductById(Long id) {
-    return productRepository.findById(id);
-  }
+    public Optional<Product> findProductById(Long id) {
+        return productRepository.findById(id);
+    }
 
-  public List<Product> listProduct() {
-    return productRepository.findAll();
-  }
+    public List<Product> listProduct() {
+        return productRepository.findAll();
+    }
 
-  public Product updateProduct(Product product) {
-    return productRepository.save(product);
-  }
+    public Product updateProduct(Product product) {
+        return productRepository.save(product);
+    }
 
-  public void deleteProduct(Long id) {
-    productRepository.deleteById(id);
-  }
+    public void deleteProduct(Long id) {
+        productRepository.deleteById(id);
+    }
 }

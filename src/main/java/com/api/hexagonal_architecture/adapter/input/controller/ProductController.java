@@ -22,61 +22,61 @@ import com.api.hexagonal_architecture.core.usecase.ProductService;
 @RequestMapping("/api/products")
 public class ProductController {
 
-  private final ProductService productService;
+    private final ProductService productService;
 
-  public ProductController(ProductService productService) {
-    this.productService = productService;
-  }
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
 
-  @PostMapping
-  public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest productRequest) {
-    Product product = new Product();
-    product.setName(productRequest.name());
-    product.setPrice(productRequest.price());
+    @PostMapping
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest productRequest) {
+        Product product = new Product();
+        product.setName(productRequest.name());
+        product.setPrice(productRequest.price());
 
-    Product productCreate = productService.createProduct(product);
-    ProductResponse response = new ProductResponse(productCreate.getId(), productCreate.getName(),
-        productCreate.getPrice());
-    return new ResponseEntity<>(response, HttpStatus.CREATED);
-  }
+        Product productCreate = productService.createProduct(product);
+        ProductResponse response = new ProductResponse(productCreate.getId(), productCreate.getName(),
+            productCreate.getPrice());
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 
-  @GetMapping("/{id}")
-  public ResponseEntity<ProductResponse> getProduct(@PathVariable Long id) {
-    Optional<Product> productOpt = productService.findProductById(id);
-    return productOpt.map(product -> ResponseEntity.ok(
-        new ProductResponse(
-            product.getId(),
-            product.getName(),
-            product.getPrice())))
-        .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-  }
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductResponse> getProduct(@PathVariable Long id) {
+        Optional<Product> productOpt = productService.findProductById(id);
+        return productOpt.map(product -> ResponseEntity.ok(
+            new ProductResponse(
+                product.getId(),
+                product.getName(),
+                product.getPrice())))
+            .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
 
-  @GetMapping
-  public ResponseEntity<List<ProductResponse>> listProduct() {
-    List<ProductResponse> products = productService.listProduct().stream()
-        .map(p -> new ProductResponse(p.getId(), p.getName(), p.getPrice()))
-        .collect(Collectors.toList());
+    @GetMapping
+    public ResponseEntity<List<ProductResponse>> listProduct() {
+        List<ProductResponse> products = productService.listProduct().stream()
+            .map(p -> new ProductResponse(p.getId(), p.getName(), p.getPrice()))
+            .collect(Collectors.toList());
 
-    return ResponseEntity.ok(products);
-  }
+        return ResponseEntity.ok(products);
+    }
 
-  @PutMapping("/{id}")
-  public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id,
-      @RequestBody ProductRequest productRequest) {
-    Product product = new Product();
-    product.setId(id);
-    product.setName(productRequest.name());
-    product.setPrice(productRequest.price());
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id,
+        @RequestBody ProductRequest productRequest) {
+        Product product = new Product();
+        product.setId(id);
+        product.setName(productRequest.name());
+        product.setPrice(productRequest.price());
 
-    Product updateProduct = productService.updateProduct(product);
-    ProductResponse response = new ProductResponse(updateProduct.getId(), updateProduct.getName(),
-        updateProduct.getPrice());
-    return ResponseEntity.ok(response);
-  }
+        Product updateProduct = productService.updateProduct(product);
+        ProductResponse response = new ProductResponse(updateProduct.getId(), updateProduct.getName(),
+            updateProduct.getPrice());
+        return ResponseEntity.ok(response);
+    }
 
-  @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-    productService.deleteProduct(id);
-    return ResponseEntity.noContent().build();
-  }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
+    }
 }

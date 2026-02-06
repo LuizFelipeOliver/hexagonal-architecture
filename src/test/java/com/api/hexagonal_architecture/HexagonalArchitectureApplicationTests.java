@@ -8,8 +8,9 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 class HexagonalArchitectureApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+        // verifies that the Spring context loads successfully
+    }
 
 }

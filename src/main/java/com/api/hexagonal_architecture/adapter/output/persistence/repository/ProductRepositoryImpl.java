@@ -12,36 +12,36 @@ import com.api.hexagonal_architecture.port.output.ProductRepositoryPort;
 
 @Repository
 public class ProductRepositoryImpl implements ProductRepositoryPort {
-  private final ProductJpaRepository productJpaRepository;
-  private final ProductMapper productMapper;
+    private final ProductJpaRepository productJpaRepository;
+    private final ProductMapper productMapper;
 
-  public ProductRepositoryImpl(ProductJpaRepository productJpaRepository, ProductMapper productMapper) {
-    this.productJpaRepository = productJpaRepository;
-    this.productMapper = productMapper;
-  }
+    public ProductRepositoryImpl(ProductJpaRepository productJpaRepository, ProductMapper productMapper) {
+        this.productJpaRepository = productJpaRepository;
+        this.productMapper = productMapper;
+    }
 
-  @Override
-  public Product save(Product product) {
-    var productEntity = productMapper.toEntity(product);
-    var savedEntity = productJpaRepository.save(productEntity);
-    return productMapper.toDomain(savedEntity);
-  }
+    @Override
+    public Product save(Product product) {
+        var productEntity = productMapper.toEntity(product);
+        var savedEntity = productJpaRepository.save(productEntity);
+        return productMapper.toDomain(savedEntity);
+    }
 
-  @Override
-  public Optional<Product> findById(Long id) {
-    return productJpaRepository.findById(id)
-        .map(productMapper::toDomain);
-  }
+    @Override
+    public Optional<Product> findById(Long id) {
+        return productJpaRepository.findById(id)
+            .map(productMapper::toDomain);
+    }
 
-  @Override
-  public List<Product> findAll() {
-    return productJpaRepository.findAll().stream()
-        .map(productMapper::toDomain)
-        .collect(Collectors.toList());
-  }
+    @Override
+    public List<Product> findAll() {
+        return productJpaRepository.findAll().stream()
+            .map(productMapper::toDomain)
+            .collect(Collectors.toList());
+    }
 
-  @Override
-  public void deleteById(Long id) {
-    productJpaRepository.deleteById(id);
-  }
+    @Override
+    public void deleteById(Long id) {
+        productJpaRepository.deleteById(id);
+    }
 }
