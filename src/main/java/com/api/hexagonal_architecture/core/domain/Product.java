@@ -36,32 +36,22 @@ public class Product {
         }
     }
 
-    public void createPrice(BigDecimal price) {
-        validatePrice(price);
-        this.price = price;
+    public void changePrice(BigDecimal newPrice) {
+        validatePrice(newPrice);
+        this.price = newPrice;
     }
 
-    public Long getId() {
-        return id;
+
+    public void changeName(String newName) {
+        validateName(newName);
+        this.name = newName;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
-    public String getName() {
-        return name;
-    }
+    public Long getId() { return id; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getName() { return name; }
 
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
+    public BigDecimal getPrice() { return price; }
 }
+
