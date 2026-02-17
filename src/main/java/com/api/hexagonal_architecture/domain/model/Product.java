@@ -5,29 +5,32 @@ import java.math.BigDecimal;
 public class Product {
     private Long id;
     private String name;
+    private String description;
     private BigDecimal price;
 
-    public Product(Long id, String name, BigDecimal price) {
+    public Product(Long id, String name, BigDecimal price, String description) {
         validateName(name);
         validatePrice(price);
         this.id = id;
         this.name = name;
         this.price = price;
+        this.description = description;
     }
 
-    public static Product create(String name, BigDecimal price) {
-        return new Product(null, name, price);
+    public static Product create(String name, BigDecimal price, String description) {
+        return new Product(null, name, price, description);
     }
 
-    public static Product reconstruct(Long id, String name, BigDecimal price) {
-        return new Product(id, name, price);
+    public static Product reconstruct(Long id, String name, BigDecimal price, String description) {
+        return new Product(id, name, price, description);
     }
 
-    public void update(String name, BigDecimal price) {
+    public void update(String name, BigDecimal price, String description) {
         validateName(name);
         validatePrice(price);
         this.name = name;
         this.price = price;
+        this.description = description;
     }
 
     private void validatePrice(BigDecimal price) {
@@ -40,8 +43,16 @@ public class Product {
     }
 
     private void validateName(String name) {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Product name is required");
+        if (name == null) {
+            throw new IllegalArgumentException("[Name]: Cannot be null");
+        }
+
+        if (name.isBlank()) {
+            throw new IllegalArgumentException("[Name]: Cannot be blank");
+        }
+
+        if (name.length() <= 2) {
+            throw new IllegalArgumentException("[Name]: Must have at least 3 characters");
         }
     }
 
@@ -55,5 +66,9 @@ public class Product {
 
     public BigDecimal getPrice() {
         return price;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

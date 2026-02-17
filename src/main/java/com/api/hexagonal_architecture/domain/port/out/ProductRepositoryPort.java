@@ -13,4 +13,6 @@ public interface ProductRepositoryPort {
     List<Product> findAll();
 
     void deleteById(Long id);
+
+    List<Product> findByName(String name);
 }

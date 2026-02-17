@@ -32,17 +32,22 @@ public class ProductService implements ProductServicePort {
     }
 
     @Override
-    public Product updateProduct(Long id, String name, BigDecimal price) {
+    public Product updateProduct(Long id, String name, BigDecimal price, String description) {
         Product product = productRepository.findById(id)
-            .orElseThrow(() -> new ProductNotFoundException(id));
-        product.update(name, price);
+                .orElseThrow(() -> new ProductNotFoundException(id));
+        product.update(name, price, description);
         return productRepository.save(product);
     }
 
     @Override
     public void deleteProduct(Long id) {
         productRepository.findById(id)
-            .orElseThrow(() -> new ProductNotFoundException(id));
+                .orElseThrow(() -> new ProductNotFoundException(id));
         productRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Product> findProductByName(String name) {
+        return productRepository.findByName(name);
     }
 }

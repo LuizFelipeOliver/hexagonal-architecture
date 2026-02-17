@@ -12,7 +12,9 @@ public interface ProductServicePort {
 
     List<Product> listProducts();
 
-    Product updateProduct(Long id, String name, java.math.BigDecimal price);
+    Product updateProduct(Long id, String name, java.math.BigDecimal price, String description);
 
     void deleteProduct(Long id);
+
+    List<Product> findProductByName(String name);
 }
