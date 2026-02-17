@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.hexagonal_architecture.domain.model.Product;
@@ -30,7 +31,7 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest request) {
-        Product product = Product.create(request.name(), request.price());
+        Product product = Product.create(request.name(), request.price(), request.description());
         Product created = productService.createProduct(product);
         return new ResponseEntity<>(ProductResponse.from(created), HttpStatus.CREATED);
     }
@@ -39,22 +40,23 @@ public class ProductController {
     public ResponseEntity<ProductResponse> getProduct(@PathVariable Long id) {
         Optional<Product> productOpt = productService.findProductById(id);
         return productOpt
-            .map(product -> ResponseEntity.ok(ProductResponse.from(product)))
-            .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+                .map(product -> ResponseEntity.ok(ProductResponse.from(product)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @GetMapping
     public ResponseEntity<List<ProductResponse>> listProducts() {
         List<ProductResponse> products = productService.listProducts().stream()
-            .map(ProductResponse::from)
-            .collect(Collectors.toList());
+                .map(ProductResponse::from)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(products);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id,
-        @RequestBody ProductRequest request) {
-        Product updated = productService.updateProduct(id, request.name(), request.price());
+    public ResponseEntity<ProductResponse> updateProduct(
+            @PathVariable Long id,
+            @RequestBody ProductRequest request) {
+        Product updated = productService.updateProduct(id, request.name(), request.price(), request.description());
         return ResponseEntity.ok(ProductResponse.from(updated));
     }
 
@@ -62,5 +64,15 @@ public class ProductController {
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductResponse>> findByName(@RequestParam String name) {
+        List<ProductResponse> products = productService.findProductByName(name)
+                .stream()
+                .map(ProductResponse::from)
+                .toList();
+
+        return ResponseEntity.ok(products);
     }
 }

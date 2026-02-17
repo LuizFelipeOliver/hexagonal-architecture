@@ -28,8 +28,8 @@ class ProductServiceTest {
 
     @Test
     void createProductShouldDelegateToRepositorySave() {
-        Product product = Product.create("Notebook", new BigDecimal("2500.00"));
-        Product saved = new Product(1L, "Notebook", new BigDecimal("2500.00"));
+        Product product = Product.create("Notebook", new BigDecimal("2500.00"), "A powerful notebook");
+        Product saved = new Product(1L, "Notebook", new BigDecimal("2500.00"), "A powerful notebook");
         when(productRepository.save(product)).thenReturn(saved);
 
         Product result = productService.createProduct(product);
@@ -41,7 +41,7 @@ class ProductServiceTest {
 
     @Test
     void findProductByIdShouldReturnProductWhenExists() {
-        Product product = new Product(1L, "Notebook", new BigDecimal("2500.00"));
+        Product product = new Product(1L, "Notebook", new BigDecimal("2500.00"), "desc");
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
 
         Optional<Product> result = productService.findProductById(1L);
@@ -64,8 +64,8 @@ class ProductServiceTest {
     @Test
     void listProductsShouldReturnListOfProducts() {
         List<Product> products = List.of(
-                new Product(1L, "Notebook", new BigDecimal("2500.00")),
-                new Product(2L, "Mouse", new BigDecimal("50.00")));
+                new Product(1L, "Notebook", new BigDecimal("2500.00"), "desc1"),
+                new Product(2L, "Mouse", new BigDecimal("50.00"), "desc2"));
         when(productRepository.findAll()).thenReturn(products);
 
         List<Product> result = productService.listProducts();
@@ -76,14 +76,15 @@ class ProductServiceTest {
 
     @Test
     void updateProductShouldFindAndUpdateProduct() {
-        Product existing = new Product(1L, "Notebook", new BigDecimal("2500.00"));
+        Product existing = new Product(1L, "Notebook", new BigDecimal("2500.00"), "Old desc");
         when(productRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(productRepository.save(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Product result = productService.updateProduct(1L, "Notebook Pro", new BigDecimal("3000.00"));
+        Product result = productService.updateProduct(1L, "Notebook Pro", new BigDecimal("3000.00"), "New desc");
 
         assertEquals("Notebook Pro", result.getName());
         assertEquals(new BigDecimal("3000.00"), result.getPrice());
+        assertEquals("New desc", result.getDescription());
         verify(productRepository).findById(1L);
         verify(productRepository).save(any(Product.class));
     }
@@ -93,12 +94,12 @@ class ProductServiceTest {
         when(productRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(ProductNotFoundException.class,
-                () -> productService.updateProduct(99L, "Name", new BigDecimal("10.00")));
+                () -> productService.updateProduct(99L, "Name", new BigDecimal("10.00"), "desc"));
     }
 
     @Test
     void deleteProductShouldDelegateToRepositoryDeleteById() {
-        Product existing = new Product(1L, "Notebook", new BigDecimal("2500.00"));
+        Product existing = new Product(1L, "Notebook", new BigDecimal("2500.00"), "desc");
         when(productRepository.findById(1L)).thenReturn(Optional.of(existing));
         doNothing().when(productRepository).deleteById(1L);
 
@@ -113,5 +114,18 @@ class ProductServiceTest {
 
         assertThrows(ProductNotFoundException.class,
                 () -> productService.deleteProduct(99L));
+    }
+
+    @Test
+    void findProductByNameShouldDelegateToRepository() {
+        List<Product> products = List.of(
+                new Product(1L, "Notebook", new BigDecimal("2500.00"), "desc"));
+        when(productRepository.findByName("Notebook")).thenReturn(products);
+
+        List<Product> result = productService.findProductByName("Notebook");
+
+        assertEquals(1, result.size());
+        assertEquals("Notebook", result.get(0).getName());
+        verify(productRepository).findByName("Notebook");
     }
 }

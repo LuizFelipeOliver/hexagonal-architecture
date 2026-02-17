@@ -33,30 +33,32 @@ class ProductControllerTest {
 
     @Test
     void postProductShouldReturn201() throws Exception {
-        Product saved = new Product(1L, "Notebook", new BigDecimal("2500.00"));
+        Product saved = new Product(1L, "Notebook", new BigDecimal("2500.00"), "A powerful notebook");
         when(productService.createProduct(any(Product.class))).thenReturn(saved);
 
         mockMvc.perform(post("/api/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"name": "Notebook", "price": 2500.00}
+                                {"name": "Notebook", "price": 2500.00, "description": "A powerful notebook"}
                                 """))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Notebook"))
-                .andExpect(jsonPath("$.price").value(2500.00));
+                .andExpect(jsonPath("$.price").value(2500.00))
+                .andExpect(jsonPath("$.description").value("A powerful notebook"));
     }
 
     @Test
     void getProductByIdShouldReturn200WhenExists() throws Exception {
-        Product product = new Product(1L, "Notebook", new BigDecimal("2500.00"));
+        Product product = new Product(1L, "Notebook", new BigDecimal("2500.00"), "desc");
         when(productService.findProductById(1L)).thenReturn(Optional.of(product));
 
         mockMvc.perform(get("/api/products/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Notebook"))
-                .andExpect(jsonPath("$.price").value(2500.00));
+                .andExpect(jsonPath("$.price").value(2500.00))
+                .andExpect(jsonPath("$.description").value("desc"));
     }
 
     @Test
@@ -70,8 +72,8 @@ class ProductControllerTest {
     @Test
     void getProductsShouldReturnListAndStatus200() throws Exception {
         List<Product> products = List.of(
-                new Product(1L, "Notebook", new BigDecimal("2500.00")),
-                new Product(2L, "Mouse", new BigDecimal("50.00")));
+                new Product(1L, "Notebook", new BigDecimal("2500.00"), "desc1"),
+                new Product(2L, "Mouse", new BigDecimal("50.00"), "desc2"));
         when(productService.listProducts()).thenReturn(products);
 
         mockMvc.perform(get("/api/products"))
@@ -83,19 +85,20 @@ class ProductControllerTest {
 
     @Test
     void putProductShouldReturn200() throws Exception {
-        Product updated = new Product(1L, "Notebook Pro", new BigDecimal("3000.00"));
-        when(productService.updateProduct(eq(1L), eq("Notebook Pro"), any(BigDecimal.class)))
+        Product updated = new Product(1L, "Notebook Pro", new BigDecimal("3000.00"), "Updated desc");
+        when(productService.updateProduct(eq(1L), eq("Notebook Pro"), any(BigDecimal.class), eq("Updated desc")))
             .thenReturn(updated);
 
         mockMvc.perform(put("/api/products/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"name": "Notebook Pro", "price": 3000.00}
+                                {"name": "Notebook Pro", "price": 3000.00, "description": "Updated desc"}
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Notebook Pro"))
-                .andExpect(jsonPath("$.price").value(3000.00));
+                .andExpect(jsonPath("$.price").value(3000.00))
+                .andExpect(jsonPath("$.description").value("Updated desc"));
     }
 
     @Test
@@ -106,5 +109,17 @@ class ProductControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(productService).deleteProduct(1L);
+    }
+
+    @Test
+    void searchProductsByNameShouldReturn200() throws Exception {
+        List<Product> products = List.of(
+                new Product(1L, "Notebook", new BigDecimal("2500.00"), "desc"));
+        when(productService.findProductByName("Notebook")).thenReturn(products);
+
+        mockMvc.perform(get("/api/products/search").param("name", "Notebook"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].name").value("Notebook"));
     }
 }

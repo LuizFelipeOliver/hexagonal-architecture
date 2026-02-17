@@ -15,23 +15,25 @@ class ProductPersistenceMapperTest {
 
     @Test
     void toEntityShouldConvertProductToProductEntity() {
-        Product product = new Product(1L, "Notebook", new BigDecimal("2500.00"));
+        Product product = new Product(1L, "Notebook", new BigDecimal("2500.00"), "ffahhfhasi");
 
         ProductEntity entity = mapper.toEntity(product);
 
         assertEquals(1L, entity.getId());
         assertEquals("Notebook", entity.getName());
         assertEquals(new BigDecimal("2500.00"), entity.getPrice());
+        assertEquals("ffahhfhasi", entity.getDescription());
     }
 
     @Test
     void toDomainShouldConvertProductEntityToProduct() {
-        ProductEntity entity = new ProductEntity(1L, "Notebook", new BigDecimal("2500.00"));
+        ProductEntity entity = new ProductEntity(1L, "Notebook", new BigDecimal("2500.00"), "njvadjvijaiovjaiojn");
 
         Product product = mapper.toDomain(entity);
 
         assertEquals(1L, product.getId());
         assertEquals("Notebook", product.getName());
         assertEquals(new BigDecimal("2500.00"), product.getPrice());
+        assertEquals("njvadjvijaiovjaiojn", product.getDescription());
     }
 }

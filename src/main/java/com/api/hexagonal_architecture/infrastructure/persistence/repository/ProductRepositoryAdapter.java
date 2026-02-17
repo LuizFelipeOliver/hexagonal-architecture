@@ -32,12 +32,20 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort {
     @Override
     public List<Product> findAll() {
         return jpaRepository.findAll().stream()
-            .map(mapper::toDomain)
-            .collect(Collectors.toList());
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
     }
 
     @Override
     public void deleteById(Long id) {
         jpaRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Product> findByName(String name) {
+        return jpaRepository.findByNameContainingIgnoreCase(name)
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
     }
 }

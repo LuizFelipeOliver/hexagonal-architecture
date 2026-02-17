@@ -5,10 +5,10 @@ import com.api.hexagonal_architecture.infrastructure.persistence.entity.ProductE
 
 public class ProductPersistenceMapper {
     public ProductEntity toEntity(Product product) {
-        return new ProductEntity(product.getId(), product.getName(), product.getPrice());
+        return new ProductEntity(product.getId(), product.getName(), product.getPrice(), product.getDescription());
     }
 
     public Product toDomain(ProductEntity entity) {
-        return Product.reconstruct(entity.getId(), entity.getName(), entity.getPrice());
+        return Product.reconstruct(entity.getId(), entity.getName(), entity.getPrice(), entity.getDescription());
     }
 }

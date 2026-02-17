@@ -16,14 +16,16 @@ public class ProductEntity {
     private Long id;
     private String name;
     private BigDecimal price;
+    private String description;
 
     public ProductEntity() {
     }
 
-    public ProductEntity(Long id, String name, BigDecimal price) {
+    public ProductEntity(Long id, String name, BigDecimal price, String description) {
         this.id = id;
         this.name = name;
         this.price = price;
+        this.description = description;
     }
 
     public Long getId() {
@@ -48,5 +50,13 @@ public class ProductEntity {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
