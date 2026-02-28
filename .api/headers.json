@@ -1,0 +1,11 @@
+{
+  "default": {
+    "Content-Type": "application/json",
+    "Accept": "application/json"
+  },
+  "auth": {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Authorization": "Bearer {{TOKEN}}"
+  }
+}
