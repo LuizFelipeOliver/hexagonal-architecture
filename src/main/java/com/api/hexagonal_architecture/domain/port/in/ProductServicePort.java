@@ -1,5 +1,6 @@
 package com.api.hexagonal_architecture.domain.port.in;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,9 +13,13 @@ public interface ProductServicePort {
 
     List<Product> listProducts();
 
-    Product updateProduct(Long id, String name, java.math.BigDecimal price, String description);
+    Product updateProduct(Long id, String name, String description, BigDecimal price);
 
     void deleteProduct(Long id);
 
     List<Product> findProductByName(String name);
+
+    Product linkRecipe(Long productId, Long recipeId);
+
+    Product unlinkRecipe(Long productId);
 }

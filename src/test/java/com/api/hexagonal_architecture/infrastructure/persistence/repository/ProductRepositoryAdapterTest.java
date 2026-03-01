@@ -12,12 +12,17 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.api.hexagonal_architecture.domain.model.Product;
 import com.api.hexagonal_architecture.infrastructure.persistence.mapper.ProductPersistenceMapper;
+import com.api.hexagonal_architecture.infrastructure.persistence.mapper.RawMaterialPersistenceMapper;
+import com.api.hexagonal_architecture.infrastructure.persistence.mapper.RecipePersistenceMapper;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @ActiveProfiles("test")
-@Import({ProductRepositoryAdapter.class, ProductPersistenceMapper.class})
+@Import({ProductRepositoryAdapter.class, ProductPersistenceMapper.class,
+        RecipePersistenceMapper.class, RawMaterialPersistenceMapper.class})
 class ProductRepositoryAdapterTest {
 
     @Autowired
@@ -25,19 +30,19 @@ class ProductRepositoryAdapterTest {
 
     @Test
     void saveShouldPersistAndReturnProductWithGeneratedId() {
-        Product product = Product.create("Notebook", new BigDecimal("2500.00"), "A powerful notebook");
+        Product product = Product.create("Notebook", "A powerful notebook", new BigDecimal("2500.00"));
 
         Product saved = productRepository.save(product);
 
         assertNotNull(saved.getId());
         assertEquals("Notebook", saved.getName());
-        assertEquals(new BigDecimal("2500.00"), saved.getPrice());
         assertEquals("A powerful notebook", saved.getDescription());
+        assertEquals(new BigDecimal("2500.00"), saved.getPrice());
     }
 
     @Test
     void findByIdShouldReturnProductWhenExists() {
-        Product product = Product.create("Mouse", new BigDecimal("50.00"), "Wireless mouse");
+        Product product = Product.create("Mouse", "Wireless mouse", new BigDecimal("50.00"));
         Product saved = productRepository.save(product);
 
         Optional<Product> found = productRepository.findById(saved.getId());
@@ -57,8 +62,8 @@ class ProductRepositoryAdapterTest {
 
     @Test
     void findAllShouldReturnAllProducts() {
-        productRepository.save(Product.create("Notebook", new BigDecimal("2500.00"), "desc1"));
-        productRepository.save(Product.create("Mouse", new BigDecimal("50.00"), "desc2"));
+        productRepository.save(Product.create("Notebook", "desc1", new BigDecimal("2500.00")));
+        productRepository.save(Product.create("Mouse", "desc2", new BigDecimal("50.00")));
 
         List<Product> products = productRepository.findAll();
 
@@ -67,7 +72,8 @@ class ProductRepositoryAdapterTest {
 
     @Test
     void deleteByIdShouldRemoveProduct() {
-        Product saved = productRepository.save(Product.create("Keyboard", new BigDecimal("150.00"), "Mechanical keyboard"));
+        Product saved = productRepository.save(
+                Product.create("Keyboard", "Mechanical keyboard", new BigDecimal("150.00")));
 
         productRepository.deleteById(saved.getId());
 
@@ -77,9 +83,9 @@ class ProductRepositoryAdapterTest {
 
     @Test
     void findByNameShouldReturnMatchingProducts() {
-        productRepository.save(Product.create("Notebook Pro", new BigDecimal("3000.00"), "desc1"));
-        productRepository.save(Product.create("Notebook Air", new BigDecimal("2000.00"), "desc2"));
-        productRepository.save(Product.create("Mouse", new BigDecimal("50.00"), "desc3"));
+        productRepository.save(Product.create("Notebook Pro", "desc1", new BigDecimal("3000.00")));
+        productRepository.save(Product.create("Notebook Air", "desc2", new BigDecimal("2000.00")));
+        productRepository.save(Product.create("Mouse", "desc3", new BigDecimal("50.00")));
 
         List<Product> results = productRepository.findByName("notebook");
 

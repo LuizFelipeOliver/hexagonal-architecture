@@ -4,110 +4,91 @@ import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ProductTest {
 
     @Test
-    void constructorWithValidDataShouldCreateProduct() {
-        Product product = new Product(1L, "Notebook", new BigDecimal("2500.00"), "A powerful notebook");
-
-        assertEquals(1L, product.getId());
-        assertEquals("Notebook", product.getName());
-        assertEquals(new BigDecimal("2500.00"), product.getPrice());
-        assertEquals("A powerful notebook", product.getDescription());
-    }
-
-    @Test
     void createFactoryMethodShouldCreateProductWithoutId() {
-        Product product = Product.create("Notebook", new BigDecimal("2500.00"), "A powerful notebook");
+        Product product = Product.create("Notebook", "A powerful notebook", new BigDecimal("2500.00"));
 
         assertNull(product.getId());
         assertEquals("Notebook", product.getName());
-        assertEquals(new BigDecimal("2500.00"), product.getPrice());
         assertEquals("A powerful notebook", product.getDescription());
+        assertEquals(new BigDecimal("2500.00"), product.getPrice());
     }
 
     @Test
     void reconstructShouldCreateProductWithId() {
-        Product product = Product.reconstruct(5L, "Mouse", new BigDecimal("50.00"), "Wireless mouse");
+        Product product = Product.reconstruct(5L, "Mouse", "Wireless mouse", new BigDecimal("50.00"), null);
 
         assertEquals(5L, product.getId());
         assertEquals("Mouse", product.getName());
-        assertEquals(new BigDecimal("50.00"), product.getPrice());
         assertEquals("Wireless mouse", product.getDescription());
+        assertEquals(new BigDecimal("50.00"), product.getPrice());
     }
 
     @Test
-    void constructorWithNullPriceShouldThrowException() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> new Product(1L, "Notebook", null, "desc"));
+    void createWithNullPriceShouldAllowNullablePrice() {
+        Product product = Product.create("Notebook", "desc", null);
 
-        assertEquals("Price is required", exception.getMessage());
+        assertNull(product.getPrice());
     }
 
     @Test
-    void constructorWithZeroPriceShouldThrowException() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> new Product(1L, "Notebook", BigDecimal.ZERO, "desc"));
-
-        assertEquals("Price must be greater than zero", exception.getMessage());
+    void createWithZeroPriceShouldThrowException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> Product.create("Notebook", "desc", BigDecimal.ZERO));
     }
 
     @Test
-    void constructorWithNegativePriceShouldThrowException() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> new Product(1L, "Notebook", new BigDecimal("-10.00"), "desc"));
-
-        assertEquals("Price must be greater than zero", exception.getMessage());
+    void createWithNegativePriceShouldThrowException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> Product.create("Notebook", "desc", new BigDecimal("-10.00")));
     }
 
     @Test
-    void constructorWithNullNameShouldThrowException() {
+    void createWithNullNameShouldThrowException() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> new Product(1L, null, new BigDecimal("100.00"), "desc"));
+                () -> Product.create(null, "desc", new BigDecimal("100.00")));
 
-        assertEquals("[Name]: Cannot be null", exception.getMessage());
+        assertEquals("[Name]: Cannot be null or blank", exception.getMessage());
     }
 
     @Test
-    void constructorWithBlankNameShouldThrowException() {
+    void createWithBlankNameShouldThrowException() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> new Product(1L, "  ", new BigDecimal("100.00"), "desc"));
+                () -> Product.create("  ", "desc", new BigDecimal("100.00")));
 
-        assertEquals("[Name]: Cannot be blank", exception.getMessage());
+        assertEquals("[Name]: Cannot be null or blank", exception.getMessage());
     }
 
     @Test
-    void constructorWithShortNameShouldThrowException() {
+    void createWithShortNameShouldThrowException() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> new Product(1L, "AB", new BigDecimal("100.00"), "desc"));
+                () -> Product.create("AB", "desc", new BigDecimal("100.00")));
 
         assertEquals("[Name]: Must have at least 3 characters", exception.getMessage());
     }
 
     @Test
-    void updateShouldChangeNamePriceAndDescription() {
-        Product product = new Product(1L, "Notebook", new BigDecimal("100.00"), "Old desc");
+    void updateShouldChangeNameDescriptionAndPrice() {
+        Product product = Product.create("Notebook", "Old desc", new BigDecimal("100.00"));
 
-        product.update("Notebook Pro", new BigDecimal("200.00"), "New desc");
+        product.update("Notebook Pro", "New desc", new BigDecimal("200.00"));
 
         assertEquals("Notebook Pro", product.getName());
-        assertEquals(new BigDecimal("200.00"), product.getPrice());
         assertEquals("New desc", product.getDescription());
+        assertEquals(new BigDecimal("200.00"), product.getPrice());
     }
 
     @Test
-    void updateWithInvalidDataShouldThrowException() {
-        Product product = new Product(1L, "Notebook", new BigDecimal("100.00"), "desc");
+    void updateWithNullNameShouldThrowException() {
+        Product product = Product.create("Notebook", "desc", new BigDecimal("100.00"));
 
         assertThrows(IllegalArgumentException.class,
-                () -> product.update(null, new BigDecimal("200.00"), "desc"));
-
-        assertThrows(IllegalArgumentException.class,
-                () -> product.update("Valid", null, "desc"));
-
-        assertThrows(IllegalArgumentException.class,
-                () -> product.update("Valid", BigDecimal.ZERO, "desc"));
+                () -> product.update(null, "desc", new BigDecimal("200.00")));
     }
 }
