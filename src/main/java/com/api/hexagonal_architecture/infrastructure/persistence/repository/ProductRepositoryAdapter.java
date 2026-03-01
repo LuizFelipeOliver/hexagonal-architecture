@@ -2,7 +2,6 @@ package com.api.hexagonal_architecture.infrastructure.persistence.repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import com.api.hexagonal_architecture.domain.model.Product;
 import com.api.hexagonal_architecture.domain.port.out.ProductRepositoryPort;
@@ -33,7 +32,7 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort {
     public List<Product> findAll() {
         return jpaRepository.findAll().stream()
                 .map(mapper::toDomain)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

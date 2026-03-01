@@ -19,8 +19,12 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ProductController.class)
 class ProductControllerTest {
@@ -33,13 +37,14 @@ class ProductControllerTest {
 
     @Test
     void postProductShouldReturn201() throws Exception {
-        Product saved = new Product(1L, "Notebook", new BigDecimal("2500.00"), "A powerful notebook");
+        Product saved = Product.reconstruct(1L, "Notebook", "A powerful notebook",
+                new BigDecimal("2500.00"), null);
         when(productService.createProduct(any(Product.class))).thenReturn(saved);
 
         mockMvc.perform(post("/api/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"name": "Notebook", "price": 2500.00, "description": "A powerful notebook"}
+                                {"name": "Notebook", "description": "A powerful notebook", "price": 2500.00}
                                 """))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
@@ -50,7 +55,7 @@ class ProductControllerTest {
 
     @Test
     void getProductByIdShouldReturn200WhenExists() throws Exception {
-        Product product = new Product(1L, "Notebook", new BigDecimal("2500.00"), "desc");
+        Product product = Product.reconstruct(1L, "Notebook", "desc", new BigDecimal("2500.00"), null);
         when(productService.findProductById(1L)).thenReturn(Optional.of(product));
 
         mockMvc.perform(get("/api/products/1"))
@@ -72,8 +77,8 @@ class ProductControllerTest {
     @Test
     void getProductsShouldReturnListAndStatus200() throws Exception {
         List<Product> products = List.of(
-                new Product(1L, "Notebook", new BigDecimal("2500.00"), "desc1"),
-                new Product(2L, "Mouse", new BigDecimal("50.00"), "desc2"));
+                Product.reconstruct(1L, "Notebook", "desc1", new BigDecimal("2500.00"), null),
+                Product.reconstruct(2L, "Mouse", "desc2", new BigDecimal("50.00"), null));
         when(productService.listProducts()).thenReturn(products);
 
         mockMvc.perform(get("/api/products"))
@@ -85,14 +90,15 @@ class ProductControllerTest {
 
     @Test
     void putProductShouldReturn200() throws Exception {
-        Product updated = new Product(1L, "Notebook Pro", new BigDecimal("3000.00"), "Updated desc");
-        when(productService.updateProduct(eq(1L), eq("Notebook Pro"), any(BigDecimal.class), eq("Updated desc")))
-            .thenReturn(updated);
+        Product updated = Product.reconstruct(1L, "Notebook Pro", "Updated desc",
+                new BigDecimal("3000.00"), null);
+        when(productService.updateProduct(eq(1L), eq("Notebook Pro"), eq("Updated desc"), any(BigDecimal.class)))
+                .thenReturn(updated);
 
         mockMvc.perform(put("/api/products/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"name": "Notebook Pro", "price": 3000.00, "description": "Updated desc"}
+                                {"name": "Notebook Pro", "description": "Updated desc", "price": 3000.00}
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
@@ -114,7 +120,7 @@ class ProductControllerTest {
     @Test
     void searchProductsByNameShouldReturn200() throws Exception {
         List<Product> products = List.of(
-                new Product(1L, "Notebook", new BigDecimal("2500.00"), "desc"));
+                Product.reconstruct(1L, "Notebook", "desc", new BigDecimal("2500.00"), null));
         when(productService.findProductByName("Notebook")).thenReturn(products);
 
         mockMvc.perform(get("/api/products/search").param("name", "Notebook"))

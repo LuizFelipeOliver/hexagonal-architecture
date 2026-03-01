@@ -1,0 +1,5 @@
+### Deletar produto
+@id = 1
+
+DELETE {{baseUrl}}/api/products/{{id}} HTTP/1.1
+Accept: {{Accept}}

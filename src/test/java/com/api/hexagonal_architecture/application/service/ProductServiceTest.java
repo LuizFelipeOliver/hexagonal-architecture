@@ -6,16 +6,21 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.api.hexagonal_architecture.domain.exception.ProductNotFoundException;
 import com.api.hexagonal_architecture.domain.model.Product;
 import com.api.hexagonal_architecture.domain.port.out.ProductRepositoryPort;
+import com.api.hexagonal_architecture.domain.port.out.RecipeRepositoryPort;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
@@ -23,15 +28,17 @@ class ProductServiceTest {
     @Mock
     private ProductRepositoryPort productRepository;
 
-    @InjectMocks
-    private ProductService productService;
+    @Mock
+    private RecipeRepositoryPort recipeRepository;
 
     @Test
     void createProductShouldDelegateToRepositorySave() {
-        Product product = Product.create("Notebook", new BigDecimal("2500.00"), "A powerful notebook");
-        Product saved = new Product(1L, "Notebook", new BigDecimal("2500.00"), "A powerful notebook");
+        Product product = Product.create("Notebook", "A powerful notebook", new BigDecimal("2500.00"));
+        Product saved = Product.reconstruct(1L, "Notebook", "A powerful notebook",
+                new BigDecimal("2500.00"), null);
         when(productRepository.save(product)).thenReturn(saved);
 
+        ProductService productService = new ProductService(productRepository, recipeRepository);
         Product result = productService.createProduct(product);
 
         assertEquals(1L, result.getId());
@@ -41,9 +48,10 @@ class ProductServiceTest {
 
     @Test
     void findProductByIdShouldReturnProductWhenExists() {
-        Product product = new Product(1L, "Notebook", new BigDecimal("2500.00"), "desc");
+        Product product = Product.reconstruct(1L, "Notebook", "desc", new BigDecimal("2500.00"), null);
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
 
+        ProductService productService = new ProductService(productRepository, recipeRepository);
         Optional<Product> result = productService.findProductById(1L);
 
         assertTrue(result.isPresent());
@@ -55,6 +63,7 @@ class ProductServiceTest {
     void findProductByIdShouldReturnEmptyWhenNotExists() {
         when(productRepository.findById(99L)).thenReturn(Optional.empty());
 
+        ProductService productService = new ProductService(productRepository, recipeRepository);
         Optional<Product> result = productService.findProductById(99L);
 
         assertTrue(result.isEmpty());
@@ -64,10 +73,11 @@ class ProductServiceTest {
     @Test
     void listProductsShouldReturnListOfProducts() {
         List<Product> products = List.of(
-                new Product(1L, "Notebook", new BigDecimal("2500.00"), "desc1"),
-                new Product(2L, "Mouse", new BigDecimal("50.00"), "desc2"));
+                Product.reconstruct(1L, "Notebook", "desc1", new BigDecimal("2500.00"), null),
+                Product.reconstruct(2L, "Mouse", "desc2", new BigDecimal("50.00"), null));
         when(productRepository.findAll()).thenReturn(products);
 
+        ProductService productService = new ProductService(productRepository, recipeRepository);
         List<Product> result = productService.listProducts();
 
         assertEquals(2, result.size());
@@ -76,11 +86,12 @@ class ProductServiceTest {
 
     @Test
     void updateProductShouldFindAndUpdateProduct() {
-        Product existing = new Product(1L, "Notebook", new BigDecimal("2500.00"), "Old desc");
+        Product existing = Product.reconstruct(1L, "Notebook", "Old desc", new BigDecimal("2500.00"), null);
         when(productRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(productRepository.save(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Product result = productService.updateProduct(1L, "Notebook Pro", new BigDecimal("3000.00"), "New desc");
+        ProductService productService = new ProductService(productRepository, recipeRepository);
+        Product result = productService.updateProduct(1L, "Notebook Pro", "New desc", new BigDecimal("3000.00"));
 
         assertEquals("Notebook Pro", result.getName());
         assertEquals(new BigDecimal("3000.00"), result.getPrice());
@@ -93,16 +104,18 @@ class ProductServiceTest {
     void updateProductShouldThrowWhenNotFound() {
         when(productRepository.findById(99L)).thenReturn(Optional.empty());
 
+        ProductService productService = new ProductService(productRepository, recipeRepository);
         assertThrows(ProductNotFoundException.class,
-                () -> productService.updateProduct(99L, "Name", new BigDecimal("10.00"), "desc"));
+                () -> productService.updateProduct(99L, "Name", "desc", new BigDecimal("10.00")));
     }
 
     @Test
     void deleteProductShouldDelegateToRepositoryDeleteById() {
-        Product existing = new Product(1L, "Notebook", new BigDecimal("2500.00"), "desc");
+        Product existing = Product.reconstruct(1L, "Notebook", "desc", new BigDecimal("2500.00"), null);
         when(productRepository.findById(1L)).thenReturn(Optional.of(existing));
         doNothing().when(productRepository).deleteById(1L);
 
+        ProductService productService = new ProductService(productRepository, recipeRepository);
         productService.deleteProduct(1L);
 
         verify(productRepository).deleteById(1L);
@@ -112,6 +125,7 @@ class ProductServiceTest {
     void deleteProductShouldThrowWhenNotFound() {
         when(productRepository.findById(99L)).thenReturn(Optional.empty());
 
+        ProductService productService = new ProductService(productRepository, recipeRepository);
         assertThrows(ProductNotFoundException.class,
                 () -> productService.deleteProduct(99L));
     }
@@ -119,9 +133,10 @@ class ProductServiceTest {
     @Test
     void findProductByNameShouldDelegateToRepository() {
         List<Product> products = List.of(
-                new Product(1L, "Notebook", new BigDecimal("2500.00"), "desc"));
+                Product.reconstruct(1L, "Notebook", "desc", new BigDecimal("2500.00"), null));
         when(productRepository.findByName("Notebook")).thenReturn(products);
 
+        ProductService productService = new ProductService(productRepository, recipeRepository);
         List<Product> result = productService.findProductByName("Notebook");
 
         assertEquals(1, result.size());
